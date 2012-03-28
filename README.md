@@ -39,6 +39,7 @@ before save or load to specify exactly where you want the persistent file placed
 
 
 To replace the guts of QDS use the useInstance method provinding your own impletation of the QuickDataStoreInterface
+
 ```java
 QDS.useInstance(QuickDataStoreInterface qds)
 ```
