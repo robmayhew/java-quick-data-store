@@ -1,8 +1,4 @@
-# Java Quick Data Store
-
-
-# Example
-
+# Java Quick Data Store (QDS)
 
 # What is it?
 
