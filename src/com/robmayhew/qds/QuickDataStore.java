@@ -315,6 +315,7 @@ public class QuickDataStore implements QuickDataStoreInterface
     {
         PrintWriter writer = new PrintWriter(new FileWriter(filePath));
         BufferedReader reader = new BufferedReader(new FileReader(swapFile));
+        boolean valueWritten = false;
         try
         {
             while (reader.ready())
@@ -323,11 +324,14 @@ public class QuickDataStore implements QuickDataStoreInterface
                 if (line.startsWith(key + "="))
                 {
                     writer.println(key + "=" + value);
+                    valueWritten = true;
                 } else
                 {
                     writer.println(line);
                 }
             }
+            if(!valueWritten)
+                writer.println(key + "=" + value);
         } finally
         {
             reader.close();
