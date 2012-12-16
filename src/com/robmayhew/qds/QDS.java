@@ -94,7 +94,9 @@ public class QDS
     public static Object load(String key)
     {
         if (instance == null)
-            return null;
+        {
+            instance = new QuickDataStore(choosePath());
+        }
         return instance.load(key);
     }
 
@@ -125,8 +127,17 @@ public class QDS
     {
         StackTraceElement[] stackTraceElements = Thread.currentThread()
                 .getStackTrace();
-        StackTraceElement st = stackTraceElements[2];
-        String className = st.getClassName();
+        String className = null;
+        for(StackTraceElement stackTraceElement : stackTraceElements)
+        {
+            String s = stackTraceElement.getClassName();
+            if(s.startsWith("java.lang") || s.startsWith("com.robmayhew.qds"))
+            {
+                continue;
+            }
+            className = s;
+            break;
+        }
 
         StringBuilder sb = new StringBuilder();
         for (char c : className.toCharArray())
