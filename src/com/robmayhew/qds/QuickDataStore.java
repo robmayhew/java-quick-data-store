@@ -30,7 +30,7 @@ import java.util.*;
  */
 public class QuickDataStore implements QuickDataStoreInterface
 {
-    private String filePath;
+    private final ValueStore valueStore;
 
 
     /**
@@ -40,7 +40,7 @@ public class QuickDataStore implements QuickDataStoreInterface
      */
     public String getFilePath()
     {
-        return filePath;
+        return null;
     }
 
     /**
@@ -48,9 +48,9 @@ public class QuickDataStore implements QuickDataStoreInterface
      *
      * @param location the location
      */
-    public QuickDataStore(String location)
+    public QuickDataStore(ValueStore valueStore)
     {
-        this.filePath = location;
+        this.valueStore = valueStore;
     }
 
     /**
@@ -98,7 +98,7 @@ public class QuickDataStore implements QuickDataStoreInterface
      */
     public Object load(String key)
     {
-        String jsonString = loadValue(key);
+        String jsonString = valueStore.loadValue(key);
         if (jsonString == null)
             return null;
         try
@@ -255,7 +255,7 @@ public class QuickDataStore implements QuickDataStoreInterface
         }
         writer.endArray();
         writer.endObject();
-        writeValue(key, sw.toString());
+        valueStore.writeValue(key, sw.toString());
     }
 
 
@@ -275,89 +275,6 @@ public class QuickDataStore implements QuickDataStoreInterface
         }
     }
 
-    private void writeValue(String key, String value) throws QDSException
-    {
-        File f = new File(filePath);
-        File swapFile = new File(filePath + ".swap");
-        if (swapFile.exists())
-        {
-            if (!swapFile.delete())
-                throw new QDSException("Unable to delete swap file "
-                        + swapFile.getPath());
-        }
-        try
-        {
-
-            renameToSwapFile(f, swapFile);
-            if (!swapFile.exists())
-            {
-                // First write
-                PrintWriter writer = new PrintWriter(new FileWriter(filePath));
-                try
-                {
-                    writer.println(key + "=" + value);
-                } finally
-                {
-                    writer.flush();
-                    writer.close();
-                }
-                return;
-            }
-            replaceValueInFile(key, value, swapFile);
-        } catch (Exception e)
-        {
-            throw new RuntimeException("Error writing file", e);
-        }
-    }
-
-    private void replaceValueInFile(String key, String value, File swapFile)
-            throws IOException
-    {
-        PrintWriter writer = new PrintWriter(new FileWriter(filePath));
-        BufferedReader reader = new BufferedReader(new FileReader(swapFile));
-        boolean valueWritten = false;
-        try
-        {
-            while (reader.ready())
-            {
-                String line = reader.readLine();
-                if (line.startsWith(key + "="))
-                {
-                    writer.println(key + "=" + value);
-                    valueWritten = true;
-                } else
-                {
-                    writer.println(line);
-                }
-            }
-            if(!valueWritten)
-                writer.println(key + "=" + value);
-        } finally
-        {
-            reader.close();
-            writer.flush();
-            writer.close();
-            cleanupSwapFile(swapFile);
-        }
-    }
-
-    private void renameToSwapFile(File f, File swapFile)
-    {
-        if (f.exists())
-        {
-            if (!f.renameTo(swapFile))
-                throw new RuntimeException("Unable to rename file " +
-                        filePath + " for writing");
-        }
-    }
-
-    private void cleanupSwapFile(File swapFile)
-    {
-        if (!swapFile.delete())
-        {
-            System.err.println("Unable to delete swap file " + swapFile.getPath());
-        }
-    }
 
     private String stripName(Method m, boolean getter)
     {
@@ -412,7 +329,7 @@ public class QuickDataStore implements QuickDataStoreInterface
             writeGetters(writer, value);
             writer.endObject();
             writer.endObject();
-            writeValue(key, sw.toString());
+            valueStore.writeValue(key, sw.toString());
         } catch (Exception e)
         {
             throw new QDSException("Error saving " + key, e);
@@ -433,7 +350,7 @@ public class QuickDataStore implements QuickDataStoreInterface
             writer.key("primitive");
             writer.value(value);
             writer.endObject();
-            writeValue(key, sw.toString());
+            valueStore.writeValue(key, sw.toString());
         } catch (Exception e)
         {
             throw new QDSException("Error saving " + key, e);
@@ -563,34 +480,5 @@ public class QuickDataStore implements QuickDataStoreInterface
         return null;
     }
 
-    private String loadValue(String key)
-    {
-        File f = new File(filePath);
-        if (!f.exists())
-            return null;
-        String jsonString = null;
-        try
-        {
-            BufferedReader reader = new BufferedReader(new FileReader(filePath));
-            try
-            {
-                while (reader.ready())
-                {
-                    String line = reader.readLine();
-                    if (line.startsWith(key + "="))
-                    {
-                        int i = line.indexOf("=");
-                        jsonString = line.substring(i + 1);
-                    }
-                }
-            } finally
-            {
-                reader.close();
-            }
-        } catch (Exception e)
-        {
-            throw new RuntimeException("Error loading " + filePath, e);
-        }
-        return jsonString;
-    }
+
 }

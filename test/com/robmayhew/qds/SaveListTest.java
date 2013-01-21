@@ -30,7 +30,7 @@ public class SaveListTest extends TestCase
     
     public void setUp()
     {        
-        store = new QuickDataStore(filePath);
+        store = new QuickDataStore(new FileValueStore(filePath));
         File testFile = new File(filePath);
         testFile.delete();
     }

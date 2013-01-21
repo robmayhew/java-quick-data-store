@@ -28,7 +28,7 @@ public class SimplePrimitiveTest extends TestCase
     String filePath = "stringTest";
     public void setUp()
     {        
-        store = new QuickDataStore(filePath);
+        store = new QuickDataStore(new FileValueStore(filePath));
         File testFile = new File(filePath);
         testFile.delete();
     }

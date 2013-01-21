@@ -33,7 +33,7 @@ public class QDS
     {
         if (instance == null)
         {
-            instance = new QuickDataStore(filePath);
+            instance = new QuickDataStore(new FileValueStore(filePath));
         } else
         {
             throw new QDSException("QuickDataStore has already been " +
@@ -49,7 +49,7 @@ public class QDS
     {
         if (instance == null)
         {
-            instance = new QuickDataStore(getUserHome() + fileName);
+            instance = new QuickDataStore(new FileValueStore(getUserHome() + fileName));
         } else
         {
             throw new QDSException("QuickDataStore has already been " +
@@ -80,7 +80,7 @@ public class QDS
     {
         if (instance == null)
         {
-            instance = new QuickDataStore(choosePath());
+            instance = new QuickDataStore(new PreferencesValueStore(chooseName()));
         }
         instance.save(key, value);
     }
@@ -95,7 +95,7 @@ public class QDS
     {
         if (instance == null)
         {
-            instance = new QuickDataStore(choosePath());
+            instance = new QuickDataStore(new PreferencesValueStore(chooseName()));
         }
         return instance.load(key);
     }
@@ -119,11 +119,16 @@ public class QDS
      */
     public static void forceUsePath(String filePath)
     {
-        instance = new QuickDataStore(filePath);
+        instance = new QuickDataStore(new FileValueStore(filePath));
     }
 
 
-    private static String choosePath()
+    public static void useFileStore()
+    {
+        instance =  new QuickDataStore(new FileValueStore(chooseName()));
+    }
+
+    private static String chooseName()
     {
         StackTraceElement[] stackTraceElements = Thread.currentThread()
                 .getStackTrace();

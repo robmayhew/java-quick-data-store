@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/qdliststore.iml" filepath="$PROJECT_DIR$/qdliststore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/java-quick-data-store.iml" filepath="$PROJECT_DIR$/java-quick-data-store.iml" />
     </modules>
   </component>
 </project>

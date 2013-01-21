@@ -28,7 +28,8 @@ public class FooObjectTest extends TestCase
     String filePath = "fooTest";
     public void setUp()
     {        
-        store = new QuickDataStore(filePath);
+        store = new QuickDataStore(new FileValueStore(filePath));
+        store = new QuickDataStore(new PreferencesValueStore(FooObjectTest.class.getSimpleName()));
         File testFile = new File(filePath);
         testFile.delete();
     }
